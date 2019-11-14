@@ -4,7 +4,6 @@ using namespace std;
 #include <Arduino.h>
 #include <Servo.h>
 #include <Wire.h>
-#include <SparkFun_APDS9960.h>
 #include <WiFi.h>
 #include "esp_wpa2.h"
 #include <ArduinoWebsockets.h>
@@ -15,14 +14,10 @@ using namespace websockets;
 #include "config.h"
 
 // Pins
-#define APDS9960_SDA 21
-#define APDS9960_SCL 22
-#define APDS9960_INT 23
-
-#define SERVO_PIN 27
+#define IR_LED_PIN 27
+#define IR_RECV_PIN 13
 
 // Global Variables
-SparkFun_APDS9960 apds = SparkFun_APDS9960();
 WebsocketsClient wsClient;
 WiFiClient client;
 Servo switchServo;
@@ -32,40 +27,6 @@ int pos = 0;
 const int offPosition = 10;
 const int neutralPosition = 60;
 const int onPosition = 100;
-void switchNeutral(){
-    switchServo.attach(SERVO_PIN);
-    switchServo.write(neutralPosition);
-    delay(500);
-    switchServo.detach();
-}
-void switchOn(){
-    switchServo.attach(SERVO_PIN);
-    for(pos = neutralPosition; pos < onPosition; pos += 1){
-        switchServo.write(pos);
-        delay(15);
-    }
-    for(pos = onPosition; pos>=neutralPosition; pos-=1){                                
-        switchServo.write(pos);
-        delay(15);
-    } 
-    switchServo.detach();
-}
-void switchOff(){
-    switchServo.attach(SERVO_PIN);
-    for(pos = neutralPosition; pos>=offPosition; pos-=1){                                
-        switchServo.write(pos);
-        delay(15);
-    }
-    for(pos = offPosition; pos < neutralPosition; pos += 1){
-        switchServo.write(pos);
-        delay(15);
-    }
-    switchServo.detach();
-}
-
-void IRAM_ATTR interruptRoutine() {
-    isr_flag = 1;
-}
 
 std::vector<String> splitStringToVector(String msg, char delim){
   std::vector<String> subStrings;
@@ -113,10 +74,10 @@ void wifiCheck(){
     }
     int counter = 0;
     while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
+        delay(1000);
         Serial.print(".");
         counter++;
-        if(counter>=60){ //after 30 seconds timeout - reset board
+        if(counter>= 15 * 60){ //after 15 min timeout - reset board
             ESP.restart();
         }
     }
@@ -130,12 +91,12 @@ void onMessage(WebsocketsMessage msg) {
         String deviceName = split_string[1];
         String fname = split_string[2];
         String command = split_string[3];
-        if(deviceName == "lightswitch" && fname == "power"){
+        if(deviceName == "computer" && fname == "power"){
             if(command == "off"){
-                switchOff();
+                //switchOff();
             }
             if(command == "on"){
-                switchOn();
+                //switchOn();
             }
         }
     }
@@ -158,67 +119,8 @@ void sendPowerCommands(String powerSetting) {
     deviceCommandRequest("4", "power", powerSetting);
 }
 
-void handleGesture() {
-    if ( apds.isGestureAvailable() ) {
-        switch ( apds.readGesture() ) {
-        case DIR_UP:
-            Serial.println("UP");
-            switchOn();
-            sendPowerCommands("on");
-            break;
-        case DIR_DOWN:
-            Serial.println("DOWN");
-            switchOff();
-            sendPowerCommands("off");
-            break;
-        case DIR_LEFT:
-            Serial.println("LEFT");
-            break;
-        case DIR_RIGHT:
-            Serial.println("RIGHT");
-            break;
-        case DIR_NEAR:
-            Serial.println("NEAR");
-            break;
-        case DIR_FAR:
-            Serial.println("FAR");
-            break;
-        default:
-            Serial.println("NONE");
-        }
-    }
-}
-
 void setup() {
     Serial.begin(115200);
-
-    switchNeutral();
-
-    //pinMode(ERROR_LED_PIN, OUTPUT);
-    //digitalWrite(ERROR_LED_PIN, HIGH);
-
-    //Setup I2C
-    Wire.begin(APDS9960_SDA, APDS9960_SCL);
-
-    // Set interrupt pin as input
-    pinMode(APDS9960_INT, INPUT);
-
-    // Initialize interrupt service routine
-    attachInterrupt(APDS9960_INT, interruptRoutine, FALLING);
-
-    // Initialize APDS-9960 (configure I2C and initial values)
-    if ( apds.init() ) {
-        Serial.println(F("APDS-9960 initialization complete"));
-    } else {
-        Serial.println(F("Something went wrong during APDS-9960 init!"));
-    }
-
-    // Start running the APDS-9960 gesture sensor engine
-    if ( apds.enableGestureSensor(true) ) {
-        Serial.println(F("Gesture sensor is now running"));
-    } else {
-        Serial.println(F("Something went wrong during gesture sensor init!"));
-    }
     //Setup wifi
 	delay(10);
     //uint8_t new_mac[8] = {0x39,0xAE,0xA4,0x16,0x1F,0x08};
@@ -236,12 +138,6 @@ void setup() {
 }
 
 void loop() {
-    if( isr_flag == 1 ) {
-        detachInterrupt(APDS9960_INT);
-        handleGesture();
-        isr_flag = 0;
-        attachInterrupt(APDS9960_INT, interruptRoutine, FALLING);
-    }
     if(WiFi.status() == WL_CONNECTED){
         if (wsClient.available()) {
             wsClient.poll();
