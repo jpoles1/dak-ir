@@ -1,0 +1,113 @@
+EESchema Schematic File Version 4
+EELAYER 29 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L 1-MyParts:ESP32-DEVKITV1 U?
+U 1 1 5DD08B6D
+P 4800 2450
+F 0 "U?" H 5825 2615 50  0000 C CNN
+F 1 "ESP32-DEVKITV1" H 5825 2524 50  0000 C CNN
+F 2 "" H 4350 2550 50  0001 C CNN
+F 3 "" H 4350 2550 50  0001 C CNN
+	1    4800 2450
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:LED D?
+U 1 1 5DD0E86C
+P 3900 3800
+F 0 "D?" V 3939 3683 50  0000 R CNN
+F 1 "LED" V 3848 3683 50  0000 R CNN
+F 2 "" H 3900 3800 50  0001 C CNN
+F 3 "~" H 3900 3800 50  0001 C CNN
+	1    3900 3800
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:LED D?
+U 1 1 5DD0F592
+P 3900 4300
+F 0 "D?" V 3939 4183 50  0000 R CNN
+F 1 "LED" V 3848 4183 50  0000 R CNN
+F 2 "" H 3900 4300 50  0001 C CNN
+F 3 "~" H 3900 4300 50  0001 C CNN
+	1    3900 4300
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	3900 4150 3900 3950
+Wire Wire Line
+	3900 4700 3900 4450
+Wire Wire Line
+	4300 4550 4700 4550
+$Comp
+L Device:R R?
+U 1 1 5DD1437F
+P 4550 4700
+F 0 "R?" V 4450 4700 50  0000 C CNN
+F 1 "100 ohm" V 4650 4700 50  0000 C CNN
+F 2 "" V 4480 4700 50  0001 C CNN
+F 3 "~" H 4550 4700 50  0001 C CNN
+	1    4550 4700
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	4300 3450 4300 4550
+Wire Wire Line
+	3900 3650 3900 3450
+$Comp
+L Device:Q_NPN_EBC Q?
+U 1 1 5DD0DE5A
+P 4100 3350
+F 0 "Q?" V 4335 3350 50  0000 C CNN
+F 1 "Q_NPN_EBC" V 4100 3000 50  0000 C CNN
+F 2 "" H 4300 3450 50  0001 C CNN
+F 3 "~" H 4100 3350 50  0001 C CNN
+	1    4100 3350
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:R R?
+U 1 1 5DD15D03
+P 4400 3050
+F 0 "R?" V 4607 3050 50  0000 C CNN
+F 1 "1K ohm" V 4516 3050 50  0000 C CNN
+F 2 "" V 4330 3050 50  0001 C CNN
+F 3 "~" H 4400 3050 50  0001 C CNN
+	1    4400 3050
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	4700 3050 4550 3050
+Wire Wire Line
+	4250 3050 4100 3050
+Wire Wire Line
+	4100 3050 4100 3150
+$Comp
+L Device:LED D?
+U 1 1 5DD1777E
+P 4150 4700
+F 0 "D?" H 4143 4916 50  0000 C CNN
+F 1 "LED" H 4143 4825 50  0000 C CNN
+F 2 "" H 4150 4700 50  0001 C CNN
+F 3 "~" H 4150 4700 50  0001 C CNN
+	1    4150 4700
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4400 4700 4300 4700
+Wire Wire Line
+	3900 4700 4000 4700
+$EndSCHEMATC

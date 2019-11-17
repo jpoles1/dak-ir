@@ -2,8 +2,8 @@
 using namespace std;
 
 #include <Arduino.h>
-#include <Servo.h>
 #include <Wire.h>
+#include <IRremote.h>
 #include <WiFi.h>
 #include "esp_wpa2.h"
 #include <ArduinoWebsockets.h>
@@ -20,8 +20,7 @@ using namespace websockets;
 // Global Variables
 WebsocketsClient wsClient;
 WiFiClient client;
-Servo switchServo;
-int isr_flag = 0;
+IRsend irsend;
 
 int pos = 0;
 const int offPosition = 10;
@@ -82,6 +81,12 @@ void wifiCheck(){
         }
     }
 }
+
+void switchPower() {
+    irsend.sendSAMSUNG(0xE0E040BF, 32);
+    Serial.println("poweroff");
+}
+
 void onMessage(WebsocketsMessage msg) {
     if (msg.data() == "ping") {
         //webSocketClient.sendData("pong");
@@ -91,12 +96,13 @@ void onMessage(WebsocketsMessage msg) {
         String deviceName = split_string[1];
         String fname = split_string[2];
         String command = split_string[3];
-        if(deviceName == "computer" && fname == "power"){
+        Serial.println(deviceName + " - " + fname + " - " + command);
+        if(deviceName == "tv" && fname == "power"){
             if(command == "off"){
-                //switchOff();
+                switchPower();
             }
             if(command == "on"){
-                //switchOn();
+                switchPower();
             }
         }
     }
@@ -120,6 +126,7 @@ void sendPowerCommands(String powerSetting) {
 }
 
 void setup() {
+    pinMode(5, OUTPUT);
     Serial.begin(115200);
     //Setup wifi
 	delay(10);
